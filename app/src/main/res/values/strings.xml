@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Cloud Project</string>
+    <string name="login">Log In</string>
+    <string name="hint_enter_password">Enter Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="forget_pwd_text">Did you forget your password?</string>
+    <string name="no_account_text">Do not have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="pwd_spec">Must include lowercase,uppercase,special character and number </string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="verify_text">Enter the code from the email that we just sent you.</string>
+    <string name="submit">Submit</string>
+    <string name="welcome">Welcome %1$s</string>
+</resources>
