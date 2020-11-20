@@ -6,6 +6,20 @@ public class User {
     private String age;
     private String email;
     private String gender;
+    private String dob;
+    private String phone;
+
+    public User(String name,
+                String email, String phone,
+                String dob , String age, String gender){
+
+        this.name = name;
+        this.age  = age;
+        this.email = email;
+        this.gender = gender;
+        this.phone =phone;
+        this.dob = dob;
+    }
 
     public String getName() {
         return name;
@@ -38,4 +52,21 @@ public class User {
     public void setGender(String gender) {
         this.gender = gender;
     }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
 }

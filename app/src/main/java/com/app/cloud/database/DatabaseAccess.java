@@ -8,7 +8,16 @@ import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
+import com.app.cloud.request.User;
+import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DatabaseAccess {
     private static final String TAG = DatabaseAccess.class.getSimpleName();
@@ -19,11 +28,28 @@ public class DatabaseAccess {
 
     private DatabaseAccess(Context context){
         Log.d(TAG,"Database Access");
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(context, Constants.POOL_ID, Regions.US_WEST_2);
+        User user =  new AppSharedPref(context).getUser();
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                context,
+                "us-west-2:f1118cda-bd6b-418f-8065-fb431c59112e", // Identity pool ID
+                Regions.US_WEST_2 // Region
+        );
+
+        Map<String, String> logins = new HashMap<String, String>();
+        logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_OeU9UzVEK", "idToken");
+        credentialsProvider.setLogins(logins);
+
         AmazonDynamoDBClient dbClient = new AmazonDynamoDBClient(credentialsProvider);
         dbClient.setRegion(Region.getRegion(Regions.US_WEST_2));
-        //dbTable = Table.loadTable(dbClient,TABLE_NAME);
-        Log.d(TAG , dbTable.getTableName());
+
+        List<KeySchemaElement> list = new ArrayList<>();
+        list.add(new KeySchemaElement("Name" , "String"));
+        list.add(new KeySchemaElement("Age" , "Number"));
+
+        //dbClient.createTable(new CreateTableRequest("Profile" , list));
+
+       // dbTable = Table.loadTable(dbClient,TABLE_NAME);
+        //Log.d(TAG , dbTable.getTableName());
     }
 
     public static synchronized DatabaseAccess getInstance(Context context){
@@ -32,6 +58,4 @@ public class DatabaseAccess {
         }
         return instance;
     }
-
-
 }

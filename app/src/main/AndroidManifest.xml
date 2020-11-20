@@ -23,7 +23,6 @@
         </activity>
         <activity android:name="com.app.cloud.activity.LoginActivity" android:theme="@style/loginScreenTheme"/>
         <activity android:name="com.app.cloud.activity.RegisterActivity" android:theme="@style/loginScreenTheme"/>
-        <activity android:name="com.app.cloud.activity.VerifyActivity" android:theme="@style/loginScreenTheme"/>
         <activity android:name="com.app.cloud.activity.DashboardActivity" android:theme="@style/loginScreenTheme"/>
 
         <service android:name=".services.MyFirebaseMessagingService"
@@ -32,6 +31,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service android:name=".services.IncomingNotificationService"/>
     </application>
 
 </manifest>

@@ -1,14 +1,27 @@
 package com.app.cloud.services;
 
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
+import com.app.cloud.utility.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
+
+    @Override
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+        Log.d(TAG, "onMessageReceived " + remoteMessage);
+        Intent intent = new Intent(this , IncomingNotificationService.class);
+        intent.setAction(Constants.PUSH);
+        intent.putExtra(Constants.PUSH_MESSAGE , "Testing the notification message");
+        intent.putExtra(Constants.SEGMENT_NAME , "Female");
+        startService(intent);
+    }
 
     @Override
     public void onNewToken(@NonNull String s) {

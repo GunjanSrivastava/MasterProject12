@@ -5,9 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.app.cloud.database.DatabaseAccess;
-import com.app.cloud.request.User;
 
-public class DBAsyncTask extends AsyncTask<User, Void, Boolean> {
+public class DBAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
     private static final String TAG = DBAsyncTask.class.getSimpleName();
     private Context context;
@@ -17,11 +16,10 @@ public class DBAsyncTask extends AsyncTask<User, Void, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(User... users) {
+    protected Boolean doInBackground(Void... voids) {
         Log.d(TAG , "Executing doInBackground...");
         boolean isSuccess = false;
         DatabaseAccess dbAccess = DatabaseAccess.getInstance(context);
-
         return true;
     }
 

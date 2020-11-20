@@ -3,7 +3,6 @@ package com.app.cloud.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
@@ -13,14 +12,15 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Auth
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
-import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.app.cloud.R;
+import com.app.cloud.fragment.ErrorHandlerFragment;
+import com.app.cloud.request.UserCognitoSessionToken;
+import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 
@@ -43,6 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        if(getIntent() != null){
+            if(getIntent().getStringExtra(Constants.USER_ID) != null){
+                emailAddress.setText(getIntent().getStringExtra(Constants.USER_ID));
+            }
+        }
     }
 
     @OnClick(R.id.login_btn)
@@ -72,8 +77,11 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
             Log.d(TAG, "Login Success");
+            UserCognitoSessionToken cognitoSession = new UserCognitoSessionToken(userSession.getAccessToken(),userSession.getIdToken(),userSession.getRefreshToken(),
+                    userSession.getUsername());
+            new AppSharedPref(LoginActivity.this).putUserSession(cognitoSession);
+
             Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
-            intent.putExtra(Constants.ID_TOKEN , userSession.getIdToken().getJWTToken());
             startActivity(intent);
             finish();
         }
@@ -100,6 +108,9 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onFailure(Exception exception) {
             Log.d(TAG, "Login Failed: " + exception.getMessage());
+            FragmentManager fm = getSupportFragmentManager();
+            ErrorHandlerFragment errorDialogFragment = new ErrorHandlerFragment(exception.getMessage());
+            errorDialogFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
         }
     };
 }
