@@ -19,8 +19,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.app.cloud.R;
+import com.app.cloud.background.DBAsyncTask;
 import com.app.cloud.fragment.NotificationFragment;
 import com.app.cloud.listeners.PushDialogListener;
+import com.app.cloud.request.Action;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.ApplicationState;
 import com.app.cloud.utility.Constants;
@@ -66,6 +68,8 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
                 showMessageDialog(message,segmentName);
             }
         }
+
+        new DBAsyncTask(this, Action.DBINSERT).execute();
     }
 
     private void showMessageDialog(String message, String segmentName){
@@ -86,6 +90,7 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
 
                         String token = task.getResult();
                         Log.d(TAG, "FCM Token: " + token);
+                        new AppSharedPref(DashboardActivity.this).putString(Constants.FCM_TOKEN , token);
                     }
                 });
     }

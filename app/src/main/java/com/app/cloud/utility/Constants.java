@@ -17,4 +17,14 @@ public class Constants {
 
     public static final String ERROR_DIALOG_FRAGMENT = "error_dialog_fragment";
     public static final String USER_ID = "user_id";
+
+    public static final String DB_USER_ID = "userId";
+    public static final String DB_NAME = "name";
+    public static final String DB_AGE = "age";
+    public static final String DB_GENDER = "gender";
+    public static final String DB_PHONE = "phone";
+    public static final String DB_DOB = "dob";
+    public static final String DB_TOKEN = "token";
+
+    public static final String FCM_TOKEN = "fcm_token";
 }

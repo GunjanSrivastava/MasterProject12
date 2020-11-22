@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
@@ -12,9 +14,11 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Auth
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
 import com.amazonaws.regions.Regions;
 import com.app.cloud.R;
 import com.app.cloud.fragment.ErrorHandlerFragment;
+import com.app.cloud.request.User;
 import com.app.cloud.request.UserCognitoSessionToken;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
@@ -25,6 +29,9 @@ import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 
 import android.widget.EditText;
+
+import java.sql.Struct;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,9 +88,8 @@ public class LoginActivity extends AppCompatActivity {
                     userSession.getUsername());
             new AppSharedPref(LoginActivity.this).putUserSession(cognitoSession);
 
-            Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
-            startActivity(intent);
-            finish();
+            // Fetch the user details
+            cognitoUser.getDetailsInBackground(getDetailsHandler);
         }
 
         @Override
@@ -111,6 +117,32 @@ public class LoginActivity extends AppCompatActivity {
             FragmentManager fm = getSupportFragmentManager();
             ErrorHandlerFragment errorDialogFragment = new ErrorHandlerFragment(exception.getMessage());
             errorDialogFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
+        }
+    };
+
+    GetDetailsHandler getDetailsHandler = new GetDetailsHandler() {
+        @Override
+        public void onSuccess(CognitoUserDetails cognitoUserDetails) {
+            // The user detail are in cognitoUserDetails
+            CognitoUserAttributes userAttributes = cognitoUserDetails.getAttributes();
+            Map<String,String> map = userAttributes.getAttributes();
+            String name = map.get("name");
+            String email = map.get("email");
+            String phone_number = map.get("phone_number");
+            String gender = map.get("gender");
+            String birthdate = map.get("birthdate");
+
+            User user = new User(name,email,phone_number,birthdate,"28",gender);
+            new AppSharedPref(LoginActivity.this).putUser(user);
+
+            Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        @Override
+        public void onFailure(Exception exception) {
+            // Fetch user details failed, check exception for the cause
         }
     };
 }
