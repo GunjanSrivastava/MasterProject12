@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.app.cloud.database.DatabaseAccess;
+import com.app.cloud.listeners.HandlePostExecuteListener;
 import com.app.cloud.request.Action;
 
 public class DBAsyncTask extends AsyncTask<Void, Void, Boolean> {
@@ -12,10 +13,12 @@ public class DBAsyncTask extends AsyncTask<Void, Void, Boolean> {
     private static final String TAG = DBAsyncTask.class.getSimpleName();
     private Context context;
     private Action action;
+    HandlePostExecuteListener listener;
 
-    public DBAsyncTask(Context context , Action action){
+    public DBAsyncTask(Context context , Action action , HandlePostExecuteListener listener){
         this.context = context;
         this.action = action;
+        this.listener = listener;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class DBAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean isSuccess) {
-        super.onPostExecute(isSuccess);
+       listener.handlePostExecute(isSuccess);
     }
 
 }

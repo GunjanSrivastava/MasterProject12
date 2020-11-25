@@ -24,6 +24,7 @@ import com.app.cloud.fragment.DatePickerFragment;
 import com.app.cloud.fragment.ErrorHandlerFragment;
 import com.app.cloud.fragment.VerifyCodeFragment;
 import com.app.cloud.listeners.DialogListener;
+import com.app.cloud.listeners.HandlePostExecuteListener;
 import com.app.cloud.request.User;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
@@ -32,7 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RegisterActivity extends AppCompatActivity implements DialogListener {
+public class RegisterActivity extends AppCompatActivity implements DialogListener, HandlePostExecuteListener {
     private static final String TAG = RegisterActivity.class.getSimpleName();
     CognitoUser cognitoUser;
     User userData;
@@ -119,6 +120,7 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
             Log.d(TAG , "Code Successfully Verified");
             Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
             intent.putExtra(Constants.USER_ID , cognitoUser.getUserId());
+            intent.putExtra(Constants.FROM_ACTIVITY, TAG);
             startActivity(intent);
         }
 
@@ -157,5 +159,11 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
         FragmentManager fm = getSupportFragmentManager();
         ErrorHandlerFragment errorHandlerFragment = new ErrorHandlerFragment(msg);
         errorHandlerFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
+    }
+
+    @Override
+    public void handlePostExecute(boolean isSuccess) {
+        Log.d(TAG , "DB Insert Success: " + isSuccess);
+
     }
 }

@@ -17,12 +17,19 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
 import com.amazonaws.regions.Regions;
 import com.app.cloud.R;
+import com.app.cloud.background.DBAsyncTask;
 import com.app.cloud.fragment.ErrorHandlerFragment;
+import com.app.cloud.listeners.HandlePostExecuteListener;
+import com.app.cloud.request.Action;
 import com.app.cloud.request.User;
 import com.app.cloud.request.UserCognitoSessionToken;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
@@ -30,15 +37,15 @@ import android.util.Log;
 
 import android.widget.EditText;
 
-import java.sql.Struct;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements HandlePostExecuteListener {
     private static final String TAG = LoginActivity.class.getSimpleName() ;
+    String from_activity;
     CognitoUser cognitoUser;
     @BindView(R.id.email_edit_text)
     EditText emailAddress;
@@ -54,22 +61,29 @@ public class LoginActivity extends AppCompatActivity {
             if(getIntent().getStringExtra(Constants.USER_ID) != null){
                 emailAddress.setText(getIntent().getStringExtra(Constants.USER_ID));
             }
+            if(getIntent().getStringExtra(Constants.FROM_ACTIVITY) != null){
+                from_activity = getIntent().getStringExtra(Constants.FROM_ACTIVITY);
+            }
         }
     }
 
     @OnClick(R.id.login_btn)
     public void onClick(){
-        String email = emailAddress.getText().toString();
-        pwd = password.getText().toString();
-        CognitoUserPool userPool = new CognitoUserPool(this,
-                Constants.POOL_ID,
-                Constants.APP_CLIENT_ID,
-                null ,
-                Regions.US_WEST_2);
+        if(emailAddress.getText() == null || password.getText() == null){
+            showErrorDialog("Fields cannot be empty");
+        }else {
+            String email = emailAddress.getText().toString();
+            pwd = password.getText().toString();
+            CognitoUserPool userPool = new CognitoUserPool(this,
+                    Constants.POOL_ID,
+                    Constants.APP_CLIENT_ID,
+                    null,
+                    Regions.US_WEST_2);
 
-        cognitoUser = userPool.getUser(email);
+            cognitoUser = userPool.getUser(email);
 
-        cognitoUser.getSessionInBackground(authenticationHandler);
+            cognitoUser.getSessionInBackground(authenticationHandler);
+        }
     }
 
     @OnClick(R.id.signUp_btn)
@@ -95,29 +109,21 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
             AuthenticationDetails authenticationDetails = new AuthenticationDetails(userId, pwd, null);
-
             authenticationContinuation.setAuthenticationDetails(authenticationDetails);
-
             authenticationContinuation.continueTask();
-        }
-
-        @Override
-        public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
-
-        }
-
-        @Override
-        public void authenticationChallenge(ChallengeContinuation continuation) {
-
         }
 
         @Override
         public void onFailure(Exception exception) {
             Log.d(TAG, "Login Failed: " + exception.getMessage());
-            FragmentManager fm = getSupportFragmentManager();
-            ErrorHandlerFragment errorDialogFragment = new ErrorHandlerFragment(exception.getMessage());
-            errorDialogFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
+            showErrorDialog(exception.getMessage());
         }
+
+        @Override
+        public void getMFACode(MultiFactorAuthenticationContinuation continuation) { }
+
+        @Override
+        public void authenticationChallenge(ChallengeContinuation continuation) { }
     };
 
     GetDetailsHandler getDetailsHandler = new GetDetailsHandler() {
@@ -134,10 +140,8 @@ public class LoginActivity extends AppCompatActivity {
 
             User user = new User(name,email,phone_number,birthdate,"28",gender);
             new AppSharedPref(LoginActivity.this).putUser(user);
-
-            Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
-            startActivity(intent);
-            finish();
+            new AppSharedPref(LoginActivity.this).putString(Constants.USER_NAME, name);
+            getFirebaseToken();
         }
 
         @Override
@@ -145,4 +149,40 @@ public class LoginActivity extends AppCompatActivity {
             // Fetch user details failed, check exception for the cause
         }
     };
+
+    private void getFirebaseToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+                        String token = task.getResult();
+                        Log.d(TAG, "FCM Token: " + token);
+                        new AppSharedPref(LoginActivity.this).putString(Constants.FCM_TOKEN , token);
+
+                        if(from_activity != null && from_activity.equals("RegisterActivity")){
+                            new DBAsyncTask(LoginActivity.this , Action.DBINSERT , LoginActivity.this).execute();
+                        }
+                        else new DBAsyncTask(LoginActivity.this , Action.DBUPDATE , LoginActivity.this).execute();
+
+                    }
+                });
+    }
+
+    @Override
+    public void handlePostExecute(boolean isSuccess) {
+        Log.d(TAG , "DB Update Success: " + isSuccess);
+        Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showErrorDialog(String msg){
+        FragmentManager fm = getSupportFragmentManager();
+        ErrorHandlerFragment errorDialogFragment = new ErrorHandlerFragment(msg);
+        errorDialogFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
+    }
 }

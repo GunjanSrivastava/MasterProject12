@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,21 +14,20 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.app.cloud.R;
-import com.app.cloud.background.DBAsyncTask;
 import com.app.cloud.fragment.NotificationFragment;
 import com.app.cloud.listeners.PushDialogListener;
-import com.app.cloud.request.Action;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.ApplicationState;
 import com.app.cloud.utility.Constants;
 import com.app.cloud.utility.Util;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,10 +51,9 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
         setContentView(R.layout.activity_dashboard);
         ButterKnife.bind(this);
         new AppSharedPref(this).putString(Constants.APP_STATE , ApplicationState.SIGNED_IN.toString());
-        getFirebaseToken();
         setSupportActionBar(toolbar);
 
-        String name = new AppSharedPref(this).getUser().getName();
+        String name = new AppSharedPref(this).getString(Constants.USER_NAME);
         welcome.setText(String.format(getResources().getString(R.string.welcome),name));
 
         if(getIntent() != null ){
@@ -68,31 +64,12 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
                 showMessageDialog(message,segmentName);
             }
         }
-
-        new DBAsyncTask(this, Action.DBINSERT).execute();
     }
 
     private void showMessageDialog(String message, String segmentName){
         FragmentManager fm = getSupportFragmentManager();
         NotificationFragment notificationDialog = new NotificationFragment(message,this);
         notificationDialog.show(fm, "fragment_notification_msg");
-    }
-
-    private void getFirebaseToken(){
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        String token = task.getResult();
-                        Log.d(TAG, "FCM Token: " + token);
-                        new AppSharedPref(DashboardActivity.this).putString(Constants.FCM_TOKEN , token);
-                    }
-                });
     }
 
     @OnClick(R.id.logout_btn)
@@ -105,29 +82,36 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
 
     @Override
     public void sendInterested() {
-        //sendUserActionToServer("Interested");
+        sendUserActionToServer(true);
     }
 
     @Override
     public void sendNotInterested() {
-        //sendUserActionToServer("Not Interested");
+        sendUserActionToServer(false);
     }
 
-    private void sendUserActionToServer(String result) {
+    private void sendUserActionToServer(boolean result) {
         Log.d(TAG, "sendUserActionToServer");
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("segment", segmentName);
-        jsonObject.addProperty("result", result);
+        String name = new AppSharedPref(this).getString(Constants.USER_NAME);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject();
+            jsonObject.put("name", name);
+            jsonObject.put("segment", segmentName);
+            jsonObject.put("interested", result);
+        }catch (JSONException exception){
+            Log.d(TAG , "Exception: "+ exception.getMessage());
+        }
 
         if (Util.isNetworkAvailable(this)) {
 
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = "https://www.google.com";
+            String url = "https://tv5nilluy7.execute-api.us-west-2.amazonaws.com/dev/digital_marketing_user_response_handler";
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
+            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, url,jsonObject,
+                    new Response.Listener() {
                         @Override
-                        public void onResponse(String response) {
+                        public void onResponse(Object response) {
                             Log.d(TAG , "User Action Sent Successfully");
                         }
                     }, new Response.ErrorListener() {

@@ -27,4 +27,6 @@ public class Constants {
     public static final String DB_TOKEN = "token";
 
     public static final String FCM_TOKEN = "fcm_token";
+    public static final String USER_NAME = "user_name";
+    public static final String FROM_ACTIVITY = "from_activity";
 }
