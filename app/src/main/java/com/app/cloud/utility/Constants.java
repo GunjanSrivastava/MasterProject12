@@ -2,11 +2,9 @@ package com.app.cloud.utility;
 
 public class Constants {
 
-    public static final String POOL_ID = "us-west-2_OeU9UzVEK";
-    public static final String APP_CLIENT_ID = "5pb0pa1fuuvbl5r14lrorruqrl";
-    public static final String REGION = "us-west-2";
+    public static final String POOL_ID = "us-east-2_1p91DepLc";
+    public static final String APP_CLIENT_ID = "2n98ld29srip6cdktqlasf76d5";
     public static final String APP_STATE = "app_state";
-    public static final String ID_TOKEN = "id_token";
     public static final String REGISTERED_USER = "registered_user";
     public static final String REGISTERED_USER_SESSION = "registered_user_session";
 
@@ -29,4 +27,5 @@ public class Constants {
     public static final String FCM_TOKEN = "fcm_token";
     public static final String USER_NAME = "user_name";
     public static final String FROM_ACTIVITY = "from_activity";
+    public static final String STRING = "String" ;
 }

@@ -84,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
                 Constants.POOL_ID,
                 Constants.APP_CLIENT_ID,
                 null ,
-                Regions.US_WEST_2);
+                Regions.US_EAST_2);
 
         CognitoUserAttributes userAttributes = new CognitoUserAttributes();
 
@@ -93,6 +93,7 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
         userAttributes.addAttribute("phone_number", phone);
         userAttributes.addAttribute("gender", gender);
         userAttributes.addAttribute("birthdate" , dob);
+        //userAttributes.addAttribute("age",userAge);
 
         userPool.signUpInBackground(email,password.getText().toString(),userAttributes,null,signUpCallback);
     }

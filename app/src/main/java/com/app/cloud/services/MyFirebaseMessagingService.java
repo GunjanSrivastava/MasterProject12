@@ -37,7 +37,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         super.onNewToken(s);
         Log.d(TAG , "Firebase Token: " + s);
         new AppSharedPref(this).putString(Constants.FCM_TOKEN , s);
-        new DBAsyncTask(this, Action.DBUPDATE,this).execute();
+       // new DBAsyncTask(this, Action.DBUPDATE,this).execute();
     }
 
     @Override

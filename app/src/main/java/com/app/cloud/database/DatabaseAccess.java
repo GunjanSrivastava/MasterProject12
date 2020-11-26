@@ -9,10 +9,16 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeAction;
+import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.AttributeValueUpdate;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
+import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemResult;
+import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemResult;
 import com.app.cloud.request.Action;
@@ -21,7 +27,10 @@ import com.app.cloud.request.UserCognitoSessionToken;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DatabaseAccess {
@@ -43,19 +52,37 @@ public class DatabaseAccess {
 
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 context,
-                "us-west-2:1264fe8a-6803-4fc8-bcf4-7a8ebe68c156", // Identity pool ID
-                Regions.US_WEST_2 // Region
+                "us-east-2:4fabf6b6-33d2-4b93-98b9-d6dc7b23edef", // Identity pool ID
+                Regions.US_EAST_2 // Region
         );
 
         Map<String, String> logins = new HashMap<String, String>();
-        logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_OeU9UzVEK", sessionTokens.getIdToken().getJWTToken());
+        logins.put("cognito-idp.us-east-2.amazonaws.com/us-east-2_1p91DepLc", sessionTokens.getIdToken().getJWTToken());
         credentialsProvider.setLogins(logins);
 
         dbClient = new AmazonDynamoDBClient(credentialsProvider);
-        dbClient.setRegion(Region.getRegion(Regions.US_WEST_2));
+        dbClient.setRegion(Region.getRegion(Regions.US_EAST_2));
 
         Table table = Table.loadTable(dbClient , TABLE_NAME);
         table.getAttributes();
+
+//        if(dbClient.listTables().getTableNames().contains(TABLE_NAME)){
+//            Table table = Table.loadTable(dbClient , TABLE_NAME);
+//            table.getAttributes();
+//        }else {
+//
+//            List<KeySchemaElement> keySchema = Arrays.asList(new KeySchemaElement(Constants.DB_USER_ID, KeyType.HASH));
+//
+//            List<AttributeDefinition> attributeDef = Arrays.asList(new AttributeDefinition(Constants.DB_NAME, ScalarAttributeType.S),
+//                    new AttributeDefinition(Constants.DB_PHONE, ScalarAttributeType.S),
+//                    new AttributeDefinition(Constants.DB_AGE, ScalarAttributeType.S),
+//                    new AttributeDefinition(Constants.DB_DOB, ScalarAttributeType.S),
+//                    new AttributeDefinition(Constants.DB_GENDER, ScalarAttributeType.S),
+//                    new AttributeDefinition(Constants.DB_TOKEN, ScalarAttributeType.S));
+//
+//            dbClient.createTable(attributeDef,TABLE_NAME,keySchema, new ProvisionedThroughput(10L, 10L));
+//
+//        }
     }
 
     public void dbInteraction(Action action){
@@ -70,12 +97,17 @@ public class DatabaseAccess {
         Log.d(TAG , "Inserting New Row...");
         Map<String, AttributeValue> map = new HashMap<>();
         map.put(Constants.DB_USER_ID , new AttributeValue(user.getEmail()));
-        map.put(Constants.DB_NAME , new AttributeValue(user.getName()));
-        map.put(Constants.DB_AGE , new AttributeValue(user.getAge()));
-        map.put(Constants.DB_PHONE , new AttributeValue(user.getPhone()));
-        map.put(Constants.DB_GENDER , new AttributeValue(user.getGender()));
-        map.put(Constants.DB_DOB , new AttributeValue(user.getDob()));
         map.put(Constants.DB_TOKEN , new AttributeValue(new AppSharedPref(context).getString(Constants.FCM_TOKEN)));
+        map.put(Constants.DB_AGE , new AttributeValue(user.getAge()));
+        map.put(Constants.DB_DOB , new AttributeValue(user.getDob()));
+        map.put(Constants.DB_GENDER , new AttributeValue(user.getGender()));
+        map.put(Constants.DB_NAME , new AttributeValue(user.getName()));
+
+        map.put(Constants.DB_PHONE , new AttributeValue(user.getPhone()));
+
+
+
+
         PutItemRequest putItemRequest = new PutItemRequest(TABLE_NAME, map);
         PutItemResult putItemResult = dbClient.putItem(putItemRequest);
         Log.d(TAG , "Inserting New Row Completed... " +putItemResult.toString());

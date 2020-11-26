@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
     @BindView(R.id.password_edit_text)
     EditText password;
     String pwd;
+    User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
                     Constants.POOL_ID,
                     Constants.APP_CLIENT_ID,
                     null,
-                    Regions.US_WEST_2);
+                    Regions.US_EAST_2);
 
             cognitoUser = userPool.getUser(email);
 
@@ -138,8 +139,8 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
             String gender = map.get("gender");
             String birthdate = map.get("birthdate");
 
-            User user = new User(name,email,phone_number,birthdate,"28",gender);
-            new AppSharedPref(LoginActivity.this).putUser(user);
+            user = new User(name,email,phone_number,birthdate,"28",gender);
+            //new AppSharedPref(LoginActivity.this).putUser(user);
             new AppSharedPref(LoginActivity.this).putString(Constants.USER_NAME, name);
             getFirebaseToken();
         }
@@ -166,7 +167,10 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
                         if(from_activity != null && from_activity.equals("RegisterActivity")){
                             new DBAsyncTask(LoginActivity.this , Action.DBINSERT , LoginActivity.this).execute();
                         }
-                        else new DBAsyncTask(LoginActivity.this , Action.DBUPDATE , LoginActivity.this).execute();
+                        else {
+                            new AppSharedPref(LoginActivity.this).putUser(user);
+                            new DBAsyncTask(LoginActivity.this , Action.DBUPDATE , LoginActivity.this).execute();
+                        }
 
                     }
                 });
