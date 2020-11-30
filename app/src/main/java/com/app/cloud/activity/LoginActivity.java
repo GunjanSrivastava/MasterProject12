@@ -19,6 +19,7 @@ import com.amazonaws.regions.Regions;
 import com.app.cloud.R;
 import com.app.cloud.background.DBAsyncTask;
 import com.app.cloud.fragment.ErrorHandlerFragment;
+import com.app.cloud.fragment.NotificationFragment;
 import com.app.cloud.listeners.HandlePostExecuteListener;
 import com.app.cloud.request.Action;
 import com.app.cloud.request.User;
@@ -70,7 +71,7 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
 
     @OnClick(R.id.login_btn)
     public void onClick(){
-        if(emailAddress.getText() == null || password.getText() == null){
+        if(emailAddress.getText().toString().equals("") || password.getText().toString().equals("")){
             showErrorDialog("Fields cannot be empty");
         }else {
             String email = emailAddress.getText().toString();
@@ -190,6 +191,8 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
 
     private void showErrorDialog(String msg){
         FragmentManager fm = getSupportFragmentManager();
+//        NotificationFragment fragment = new NotificationFragment("Black friday Sales","hdgjhkjegdegjdjnjb vdhguehdkbhcfhdgchjd dhgj" , null);
+//        fragment.show(fm,Constants.ERROR_DIALOG_FRAGMENT);
         ErrorHandlerFragment errorDialogFragment = new ErrorHandlerFragment(msg);
         errorDialogFragment.show(fm, Constants.ERROR_DIALOG_FRAGMENT);
     }

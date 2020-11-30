@@ -2,10 +2,13 @@ package com.app.cloud.services;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -47,7 +50,7 @@ public class IncomingNotificationService extends Service {
                 activityIntent.putExtra(Constants.SEGMENT_NAME , segment);
                 startActivity(activityIntent);
             }else
-                startForeground(12345,createNotification(intent,123,NotificationManager.IMPORTANCE_HIGH));
+                startForeground(1,createNotification(intent,123,NotificationManager.IMPORTANCE_HIGH));
         }
 
         return START_NOT_STICKY;
@@ -75,7 +78,7 @@ public class IncomingNotificationService extends Service {
                     pendingIntent,
                     activityIntent,
                     notificationId,
-                    "notification-channel-high-importance");
+                    createChannel());
         } else {
             return new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.ic_launcher_background)
@@ -101,6 +104,20 @@ public class IncomingNotificationService extends Service {
                         .setAutoCancel(true);
 
         return builder.build();
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private String createChannel() {
+        NotificationChannel callInviteChannel = new NotificationChannel("Constants.VOICE_CHANNEL_HIGH_IMPORTANCE",
+                "Primary Voice Channel", NotificationManager.IMPORTANCE_HIGH);
+        String channelId = "Constants.VOICE_CHANNEL_HIGH_IMPORTANCE";
+
+        callInviteChannel.setLightColor(Color.GREEN);
+        callInviteChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(callInviteChannel);
+
+        return channelId;
     }
 
     private boolean isAppVisible() {

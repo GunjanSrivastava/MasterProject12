@@ -32,7 +32,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
         intent.setAction(Constants.PUSH);
         intent.putExtra(Constants.PUSH_TITLE, data.get("title"));
         intent.putExtra(Constants.PUSH_MESSAGE, data.get("message"));
-        intent.putExtra(Constants.SEGMENT_NAME, data.get("segment_id"));
+        intent.putExtra(Constants.SEGMENT_NAME, data.get("segment_name"));
         startService(intent);
     }
 
