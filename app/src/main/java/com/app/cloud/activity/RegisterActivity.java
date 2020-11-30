@@ -1,15 +1,18 @@
 package com.app.cloud.activity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
@@ -22,6 +25,7 @@ import com.amazonaws.services.cognitoidentityprovider.model.SignUpResult;
 import com.app.cloud.R;
 import com.app.cloud.fragment.DatePickerFragment;
 import com.app.cloud.fragment.ErrorHandlerFragment;
+import com.app.cloud.fragment.MyDatePickerFragment;
 import com.app.cloud.fragment.VerifyCodeFragment;
 import com.app.cloud.listeners.DialogListener;
 import com.app.cloud.listeners.HandlePostExecuteListener;
@@ -29,11 +33,14 @@ import com.app.cloud.request.User;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.Constants;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RegisterActivity extends AppCompatActivity implements DialogListener, HandlePostExecuteListener {
+public class RegisterActivity extends AppCompatActivity implements DialogListener, HandlePostExecuteListener, DatePickerDialog.OnDateSetListener {
     private static final String TAG = RegisterActivity.class.getSimpleName();
     CognitoUser cognitoUser;
     User userData;
@@ -145,6 +152,9 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
 
     @OnClick({R.id.select_dob_view , R.id.dob_edit_text})
     public void selectDate(){
+//        MyDatePickerFragment datePicker = new MyDatePickerFragment();
+//        datePicker.show(getSupportFragmentManager(), "date picker");
+
         FragmentManager fm = getSupportFragmentManager();
         DatePickerFragment datePickerDialogFragment = new DatePickerFragment(this);
         datePickerDialogFragment.show(fm, "fragment_verifyCode");
@@ -166,5 +176,16 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
     public void handlePostExecute(boolean isSuccess) {
         Log.d(TAG , "DB Insert Success: " + isSuccess);
 
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR,year);
+        c.set(Calendar.MONTH,month);
+        c.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+        String currentDateString = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
+
+        selectedDOB.setText(currentDateString);
     }
 }

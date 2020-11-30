@@ -165,7 +165,11 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
                         new AppSharedPref(LoginActivity.this).putString(Constants.FCM_TOKEN , token);
 
                         if(from_activity != null && from_activity.equals("RegisterActivity")){
-                            new DBAsyncTask(LoginActivity.this , Action.DBINSERT , LoginActivity.this).execute();
+                            Intent intent = new Intent(LoginActivity.this , DashboardActivity.class);
+                            intent.putExtra(Constants.FROM_ACTIVITY, from_activity);
+                            startActivity(intent);
+                            finish();
+                            //new DBAsyncTask(LoginActivity.this , Action.DBINSERT , LoginActivity.this).execute();
                         }
                         else {
                             new AppSharedPref(LoginActivity.this).putUser(user);

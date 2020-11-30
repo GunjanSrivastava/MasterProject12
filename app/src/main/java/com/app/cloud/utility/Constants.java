@@ -9,6 +9,7 @@ public class Constants {
     public static final String REGISTERED_USER_SESSION = "registered_user_session";
 
     public static final String PUSH = "push";
+    public static final String PUSH_TITLE = "push_title";
     public static final String PUSH_MESSAGE = "push_message";
     public static final String SEGMENT_NAME = "segment_name" ;
 

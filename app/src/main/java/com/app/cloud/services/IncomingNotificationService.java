@@ -31,8 +31,10 @@ public class IncomingNotificationService extends Service {
         Log.d(TAG , "onStartCommand " + intent);
         String msg = "";
         String segment = "";
+        String title ="";
         if(intent != null){
             if(isAppVisible()){
+                title = intent.getStringExtra(Constants.PUSH_TITLE);
                 msg = intent.getStringExtra(Constants.PUSH_MESSAGE);
                 segment = intent.getStringExtra(Constants.SEGMENT_NAME);
 
@@ -40,6 +42,7 @@ public class IncomingNotificationService extends Service {
                 activityIntent.setAction(intent.getAction());
                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activityIntent.putExtra(Constants.PUSH_TITLE , title);
                 activityIntent.putExtra(Constants.PUSH_MESSAGE , msg);
                 activityIntent.putExtra(Constants.SEGMENT_NAME , segment);
                 startActivity(activityIntent);
@@ -53,12 +56,14 @@ public class IncomingNotificationService extends Service {
 
     private Notification createNotification(Intent intent, int notificationId, int channelImportance) {
 
+        String title = intent.getStringExtra(Constants.PUSH_TITLE);
         String msg = intent.getStringExtra(Constants.PUSH_MESSAGE);
         String segment = intent.getStringExtra(Constants.SEGMENT_NAME);
 
         Intent activityIntent = new Intent(this, DashboardActivity.class);
         activityIntent.setAction(intent.getAction());
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activityIntent.putExtra(Constants.PUSH_TITLE , title);
         activityIntent.putExtra(Constants.PUSH_MESSAGE , msg);
         activityIntent.putExtra(Constants.SEGMENT_NAME , segment);
 

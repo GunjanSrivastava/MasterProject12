@@ -110,7 +110,7 @@ public class DatabaseAccess {
 
         PutItemRequest putItemRequest = new PutItemRequest(TABLE_NAME, map);
         PutItemResult putItemResult = dbClient.putItem(putItemRequest);
-        Log.d(TAG , "Inserting New Row Completed... " +putItemResult.toString());
+        Log.d(TAG , "Inserting New Row Completed... " +dbClient.listTables().getTableNames().get(0).length());
     }
 
     public void updateRow(){

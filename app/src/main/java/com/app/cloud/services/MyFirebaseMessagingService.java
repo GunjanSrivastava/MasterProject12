@@ -15,6 +15,8 @@ import com.app.cloud.utility.Constants;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService implements HandlePostExecuteListener {
 
     private static final String TAG = MyFirebaseMessagingService.class.getSimpleName();
@@ -24,11 +26,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService impleme
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         Log.d(TAG, "onMessageReceived " + remoteMessage);
-
-        Intent intent = new Intent(this , IncomingNotificationService.class);
+        Log.d(TAG , "priority: " + remoteMessage.getPriority());
+        Map<String,String> data = remoteMessage.getData();
+        Intent intent = new Intent(this, IncomingNotificationService.class);
         intent.setAction(Constants.PUSH);
-        intent.putExtra(Constants.PUSH_MESSAGE , "Testing the notification message");
-        intent.putExtra(Constants.SEGMENT_NAME , "Female");
+        intent.putExtra(Constants.PUSH_TITLE, data.get("title"));
+        intent.putExtra(Constants.PUSH_MESSAGE, data.get("message"));
+        intent.putExtra(Constants.SEGMENT_NAME, data.get("segment_id"));
         startService(intent);
     }
 

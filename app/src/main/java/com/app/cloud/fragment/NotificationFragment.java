@@ -20,10 +20,12 @@ public class NotificationFragment extends DialogFragment implements View.OnClick
     Button interested_btn;
     Button not_interested_btn;
     String message;
+    String titleText;
     PushDialogListener listener;
 
-    public NotificationFragment(String msg , PushDialogListener pushDialogListener){
+    public NotificationFragment(String title ,String msg , PushDialogListener pushDialogListener){
         this.message = msg;
+        this.titleText = title;
         listener = pushDialogListener;
     }
 
@@ -38,10 +40,12 @@ public class NotificationFragment extends DialogFragment implements View.OnClick
         super.onViewCreated(view, savedInstanceState);
         interested_btn = view.findViewById(R.id.interested_btn);
         not_interested_btn = view.findViewById(R.id.not_interested_btn);
+        TextView title = view.findViewById(R.id.notificationTitle);
         TextView msg = view.findViewById(R.id.push_message);
         interested_btn.setOnClickListener(this);
         not_interested_btn.setOnClickListener(this);
         msg.setText(message);
+        title.setText(titleText);
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         setCancelable(false);

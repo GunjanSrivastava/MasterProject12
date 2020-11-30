@@ -18,8 +18,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.app.cloud.R;
+import com.app.cloud.background.DBAsyncTask;
 import com.app.cloud.fragment.NotificationFragment;
+import com.app.cloud.listeners.HandlePostExecuteListener;
 import com.app.cloud.listeners.PushDialogListener;
+import com.app.cloud.request.Action;
 import com.app.cloud.utility.AppSharedPref;
 import com.app.cloud.utility.ApplicationState;
 import com.app.cloud.utility.Constants;
@@ -33,11 +36,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DashboardActivity extends AppCompatActivity implements PushDialogListener {
+public class DashboardActivity extends AppCompatActivity implements PushDialogListener, HandlePostExecuteListener {
 
     private static final String TAG = DashboardActivity.class.getSimpleName();
     String segmentName;
     String message;
+    String title;
 
     @BindView(R.id.welcome_text)
     TextView welcome;
@@ -61,14 +65,18 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
             if(intent.getAction() != null && intent.getAction().equals(Constants.PUSH)){
                 segmentName = intent.getStringExtra(Constants.SEGMENT_NAME);
                 message = intent.getStringExtra(Constants.PUSH_MESSAGE);
+                title = intent.getStringExtra(Constants.PUSH_TITLE);
                 showMessageDialog(message,segmentName);
+            }
+            if(intent.getStringExtra(Constants.FROM_ACTIVITY)!= null && intent.getStringExtra(Constants.FROM_ACTIVITY).equals("RegisterActivity")){
+                new DBAsyncTask(DashboardActivity.this , Action.DBINSERT , this).execute();
             }
         }
     }
 
     private void showMessageDialog(String message, String segmentName){
         FragmentManager fm = getSupportFragmentManager();
-        NotificationFragment notificationDialog = new NotificationFragment(message,this);
+        NotificationFragment notificationDialog = new NotificationFragment(title,message,this);
         notificationDialog.show(fm, "fragment_notification_msg");
     }
 
@@ -122,5 +130,10 @@ public class DashboardActivity extends AppCompatActivity implements PushDialogLi
             });
             queue.add(stringRequest);
         }
+    }
+
+    @Override
+    public void handlePostExecute(boolean isSuccess) {
+
     }
 }

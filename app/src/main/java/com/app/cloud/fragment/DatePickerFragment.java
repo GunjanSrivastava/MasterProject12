@@ -45,7 +45,19 @@ public class DatePickerFragment extends DialogFragment implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        String date = datePicker.getDayOfMonth()+"/"+ (datePicker.getMonth() + 1)+"/"+datePicker.getYear();
+        String sDay;
+        String sMonth;
+        int day =  datePicker.getDayOfMonth();
+        int month = datePicker.getMonth()+1;
+        if(day < 10){
+            sDay = String.format("%02d", day) +"/";
+        }else sDay = day+"/";
+
+        if(month < 10){
+            sMonth = String.format("%02d", month) +"/";
+        }else sMonth = month+"/";
+
+        String date = sDay+ sMonth +datePicker.getYear();
         dialogListener.setDate(date);
         dismiss();
     }
