@@ -134,6 +134,7 @@
         android:id="@+id/password_edit_text"
         android:layout_below="@+id/dob_layout"
         android:gravity="center"
+        android:inputType="textPassword"
         android:hint="@string/hint_enter_password"/>
 
     <EditText
@@ -146,6 +147,7 @@
         android:id="@+id/confirm_pwd_edit_text"
         android:layout_below="@+id/password_edit_text"
         android:gravity="center"
+        android:inputType="textPassword"
         android:hint="@string/hint_confirm_password"/>
 
     <Button

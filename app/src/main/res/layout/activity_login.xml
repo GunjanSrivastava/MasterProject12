@@ -32,6 +32,7 @@
         android:id="@+id/password_edit_text"
         android:layout_below="@+id/email_edit_text"
         android:gravity="center"
+        android:inputType="textPassword"
         android:hint="@string/hint_enter_password"/>
 
     <Button
@@ -47,17 +48,17 @@
         android:id="@+id/login_btn"
         android:text="@string/login">
     </Button>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:layout_below="@+id/login_btn"
-        android:text="@string/forget_pwd_text"
-        android:id="@+id/forgot_pwd_text"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="20sp">
-    </TextView>
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textColor="@color/colorAccent"-->
+<!--        android:layout_below="@+id/login_btn"-->
+<!--        android:text="@string/forget_pwd_text"-->
+<!--        android:id="@+id/forgot_pwd_text"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:layout_marginRight="20sp">-->
+<!--    </TextView>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
