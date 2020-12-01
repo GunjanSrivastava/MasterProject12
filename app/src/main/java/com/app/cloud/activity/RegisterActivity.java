@@ -91,7 +91,7 @@ public class RegisterActivity extends AppCompatActivity implements DialogListene
                 Constants.POOL_ID,
                 Constants.APP_CLIENT_ID,
                 null ,
-                Regions.US_EAST_2);
+                Regions.US_WEST_2);
 
         CognitoUserAttributes userAttributes = new CognitoUserAttributes();
 

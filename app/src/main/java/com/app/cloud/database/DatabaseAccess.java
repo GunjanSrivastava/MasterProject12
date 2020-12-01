@@ -52,16 +52,16 @@ public class DatabaseAccess {
 
         credentialsProvider = new CognitoCachingCredentialsProvider(
                 context,
-                "us-east-2:4fabf6b6-33d2-4b93-98b9-d6dc7b23edef", // Identity pool ID
-                Regions.US_EAST_2 // Region
+                "us-west-2:67e86679-b583-4926-b4e5-a1e54d3f5f23", // Identity pool ID
+                Regions.US_WEST_2 // Region
         );
 
         Map<String, String> logins = new HashMap<String, String>();
-        logins.put("cognito-idp.us-east-2.amazonaws.com/us-east-2_1p91DepLc", sessionTokens.getIdToken().getJWTToken());
+        logins.put("cognito-idp.us-west-2.amazonaws.com/us-west-2_7jOscenAf", sessionTokens.getIdToken().getJWTToken());
         credentialsProvider.setLogins(logins);
 
         dbClient = new AmazonDynamoDBClient(credentialsProvider);
-        dbClient.setRegion(Region.getRegion(Regions.US_EAST_2));
+        dbClient.setRegion(Region.getRegion(Regions.US_WEST_2));
 
         Table table = Table.loadTable(dbClient , TABLE_NAME);
         table.getAttributes();
@@ -97,16 +97,12 @@ public class DatabaseAccess {
         Log.d(TAG , "Inserting New Row...");
         Map<String, AttributeValue> map = new HashMap<>();
         map.put(Constants.DB_USER_ID , new AttributeValue(user.getEmail()));
-        map.put(Constants.DB_TOKEN , new AttributeValue(new AppSharedPref(context).getString(Constants.FCM_TOKEN)));
         map.put(Constants.DB_AGE , new AttributeValue(user.getAge()));
         map.put(Constants.DB_DOB , new AttributeValue(user.getDob()));
         map.put(Constants.DB_GENDER , new AttributeValue(user.getGender()));
         map.put(Constants.DB_NAME , new AttributeValue(user.getName()));
-
         map.put(Constants.DB_PHONE , new AttributeValue(user.getPhone()));
-
-
-
+        map.put(Constants.DB_TOKEN , new AttributeValue(new AppSharedPref(context).getString(Constants.FCM_TOKEN)));
 
         PutItemRequest putItemRequest = new PutItemRequest(TABLE_NAME, map);
         PutItemResult putItemResult = dbClient.putItem(putItemRequest);

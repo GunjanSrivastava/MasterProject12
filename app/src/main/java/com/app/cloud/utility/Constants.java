@@ -2,8 +2,8 @@ package com.app.cloud.utility;
 
 public class Constants {
 
-    public static final String POOL_ID = "us-east-2_1p91DepLc";
-    public static final String APP_CLIENT_ID = "2n98ld29srip6cdktqlasf76d5";
+    public static final String POOL_ID = "us-west-2_7jOscenAf";
+    public static final String APP_CLIENT_ID = "1hfdb6ulfpt8ctceh909ejjal6";
     public static final String APP_STATE = "app_state";
     public static final String REGISTERED_USER = "registered_user";
     public static final String REGISTERED_USER_SESSION = "registered_user_session";

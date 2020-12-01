@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
                     Constants.POOL_ID,
                     Constants.APP_CLIENT_ID,
                     null,
-                    Regions.US_EAST_2);
+                    Regions.US_WEST_2);
 
             cognitoUser = userPool.getUser(email);
 
@@ -148,6 +148,7 @@ public class LoginActivity extends AppCompatActivity implements HandlePostExecut
 
         @Override
         public void onFailure(Exception exception) {
+            Log.d(TAG , "Failed:"+exception.getMessage());
             // Fetch user details failed, check exception for the cause
         }
     };
